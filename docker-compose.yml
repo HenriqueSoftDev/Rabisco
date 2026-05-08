@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: biblioteca-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: biblioteca
+
+  app:
+    build: .
+    container_name: biblioteca-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/biblioteca
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - mongodb
+
+volumes:
+  mongo-data:

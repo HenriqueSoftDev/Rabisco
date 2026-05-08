@@ -1,0 +1,17 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/biblioteca}
+  thymeleaf:
+    cache: false
+  web:
+    resources:
+      cache:
+        period: 0
+
+server:
+  port: ${PORT:8080}
+
+external:
+  openlibrary:
+    base-url: ${OPENLIBRARY_URL:https://openlibrary.org}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Buscar por ISBN — Minha Biblioteca</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body class="bg-body-secondary">
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <h2 class="h4 fw-bold mb-4"><i class="bi bi-search me-2 text-primary"></i>Buscar livro por ISBN</h2>
+
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="input-group input-group-lg">
+            <input type="text" id="isbnInput" class="form-control"
+                   placeholder="Digite o ISBN (ex: 9780132350884)"
+                   maxlength="13" onkeydown="if(event.key==='Enter') searchIsbn()"/>
+            <button class="btn btn-primary" type="button" onclick="searchIsbn()">
+              <i class="bi bi-search me-1"></i>Buscar
+            </button>
+          </div>
+          <div class="form-text">Aceita ISBN-10 e ISBN-13. Somente números.</div>
+        </div>
+      </div>
+
+      <div id="result" class="d-none">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <div class="d-flex gap-4">
+              <img id="resCover" class="rounded shadow d-none" style="width:100px;object-fit:cover" alt="Capa"/>
+              <div class="flex-fill">
+                <h4 id="resTitle" class="fw-bold mb-1"></h4>
+                <p id="resAuthor" class="text-muted mb-1"></p>
+                <p id="resYear" class="small text-muted mb-2"></p>
+                <p id="resSynopsis" class="small mb-3"></p>
+                <button class="btn btn-success" onclick="addToLibrary()">
+                  <i class="bi bi-plus-circle me-1"></i>Adicionar à biblioteca
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="notFound" class="alert alert-warning d-none">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Livro não encontrado para este ISBN.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index:9999"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/app.js}"></script>
+<script>
+  let currentBook = null;
+
+  async function searchIsbn() {
+    const isbn = document.getElementById('isbnInput').value.replace(/\D/g, '');
+    if (!isbn) return;
+    document.getElementById('result').classList.add('d-none');
+    document.getElementById('notFound').classList.add('d-none');
+    const res = await fetch('/api/external/lookup?isbn=' + isbn);
+    if (!res.ok) {
+      document.getElementById('notFound').classList.remove('d-none');
+      return;
+    }
+    currentBook = await res.json();
+    document.getElementById('resTitle').textContent = currentBook.title || '(sem título)';
+    document.getElementById('resAuthor').textContent = currentBook.author || '';
+    document.getElementById('resYear').textContent = currentBook.publishedYear ? 'Publicado em ' + currentBook.publishedYear : '';
+    document.getElementById('resSynopsis').textContent = currentBook.synopsis || '';
+    if (currentBook.coverUrl) {
+      const img = document.getElementById('resCover');
+      img.src = currentBook.coverUrl;
+      img.classList.remove('d-none');
+    }
+    document.getElementById('result').classList.remove('d-none');
+  }
+
+  async function addToLibrary() {
+    if (!currentBook) return;
+    const res = await fetch('/api/books', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        title: currentBook.title,
+        author: currentBook.author,
+        isbn: currentBook.isbn,
+        publishedYear: currentBook.publishedYear,
+        synopsis: currentBook.synopsis,
+        coverUrl: currentBook.coverUrl,
+        status: 'WANT_TO_READ'
+      })
+    });
+    if (res.ok) {
+      window.location.href = '/dashboard';
+    } else {
+      const err = await res.json();
+      showToast(err.message || 'Erro ao adicionar', 'danger');
+    }
+  }
+</script>
+</body>
+</html>

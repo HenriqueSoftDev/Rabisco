@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title th:text="${book.title} + ' — Minha Biblioteca'">Livro</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body class="bg-body-secondary">
+
+<div th:replace="~{fragments/nav :: navbar}"></div>
+
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a th:href="@{/dashboard}">Acervo</a></li>
+      <li class="breadcrumb-item active" th:text="${book.title}"></li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <div class="col-md-3 text-center">
+      <img th:if="${book.coverUrl != null and !book.coverUrl.isEmpty()}"
+           th:src="${book.coverUrl}" class="img-fluid rounded shadow" style="max-height:320px" alt="Capa"/>
+      <div th:unless="${book.coverUrl != null and !book.coverUrl.isEmpty()}"
+           class="rounded bg-light d-flex align-items-center justify-content-center shadow"
+           style="height:320px">
+        <i class="bi bi-book text-muted" style="font-size:5rem"></i>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <h1 class="h3 fw-bold mb-1" th:text="${book.title}">Título</h1>
+          <p class="text-muted fs-5 mb-2" th:text="${book.author}">Autor</p>
+        </div>
+        <span class="badge fs-6 px-3 py-2"
+              th:classappend="${book.status.name() == 'READ'} ? 'bg-success' : (${book.status.name() == 'READING'} ? 'bg-warning text-dark' : 'bg-secondary')"
+              th:text="${book.status.name() == 'READ'} ? 'Lido' : (${book.status.name() == 'READING'} ? 'Lendo' : 'Quero Ler')"></span>
+      </div>
+
+      <div th:if="${book.rating != null}" class="mb-3">
+        <span th:each="i : ${#numbers.sequence(1,5)}"
+              th:class="${i <= book.rating} ? 'bi bi-star-fill text-warning fs-5' : 'bi bi-star text-muted fs-5'"></span>
+      </div>
+
+      <dl class="row">
+        <dt class="col-sm-3" th:if="${book.isbn != null}">ISBN</dt>
+        <dd class="col-sm-9" th:if="${book.isbn != null}" th:text="${book.isbn}"></dd>
+
+        <dt class="col-sm-3" th:if="${book.genre != null}">Gênero</dt>
+        <dd class="col-sm-9" th:if="${book.genre != null}" th:text="${book.genre}"></dd>
+
+        <dt class="col-sm-3" th:if="${book.publishedYear != null}">Ano</dt>
+        <dd class="col-sm-9" th:if="${book.publishedYear != null}" th:text="${book.publishedYear}"></dd>
+
+        <dt class="col-sm-3">Adicionado em</dt>
+        <dd class="col-sm-9" th:text="${#temporals.format(book.addedAt, 'dd/MM/yyyy HH:mm')}"></dd>
+      </dl>
+
+      <div th:if="${book.synopsis != null and !book.synopsis.isEmpty()}" class="mt-3">
+        <h5 class="fw-semibold">Sinopse</h5>
+        <p class="text-muted" th:text="${book.synopsis}"></p>
+      </div>
+
+      <div class="d-flex gap-2 mt-4">
+        <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-primary">
+          <i class="bi bi-pencil me-1"></i>Editar
+        </a>
+        <button class="btn btn-outline-danger" th:data-id="${book.id}" onclick="deleteBook(this)">
+          <i class="bi bi-trash me-1"></i>Remover
+        </button>
+        <a th:href="@{/dashboard}" class="btn btn-outline-secondary ms-auto">
+          <i class="bi bi-arrow-left me-1"></i>Voltar
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Remover livro?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-muted small">Esta ação não pode ser desfeita.</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-danger btn-sm" id="confirmDelete">Remover</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

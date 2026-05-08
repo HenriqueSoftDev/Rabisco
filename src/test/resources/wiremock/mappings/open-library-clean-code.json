@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/books",
+    "queryParameters": {
+      "bibkeys": { "equalTo": "ISBN:9780132350884" },
+      "format":  { "equalTo": "json" },
+      "jscmd":   { "equalTo": "data" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": { "Content-Type": "application/json" },
+    "bodyFileName": "open-library-clean-code.json"
+  }
+}

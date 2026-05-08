@@ -1,0 +1,15 @@
+spring:
+  data:
+    mongodb:
+      # Overridden at runtime by @ServiceConnection Testcontainers
+      uri: mongodb://localhost:27017/biblioteca_test
+
+external:
+  openlibrary:
+    # Overridden in VCR tests to point to WireMock
+    base-url: http://localhost:8089
+
+logging:
+  level:
+    org.springframework.security: WARN
+    org.testcontainers: WARN
