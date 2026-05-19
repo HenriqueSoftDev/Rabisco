@@ -55,8 +55,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: >
           mvn -B sonar:sonar
-          -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY || 'biblioteca-pessoal' }}
-          -Dsonar.organization=${{ vars.SONAR_ORG || 'biblioteca' }}
+          -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY || 'HenriqueSoftDev_Rabisco' }}
+          -Dsonar.organization=${{ vars.SONAR_ORG || 'henriquesoftdev' }}
           -Dsonar.host.url=https://sonarcloud.io
 
       - name: Check Coverage Gate (80%)
