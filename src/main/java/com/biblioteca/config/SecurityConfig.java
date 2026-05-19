@@ -36,9 +36,9 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // NOSONAR: HttpOnly=false intencional — JavaScript precisa ler o token CSRF para incluí-lo nas requisições fetch()
                 .csrfTokenRequestHandler(requestHandler)
-                .ignoringRequestMatchers("/api/**")
+                .ignoringRequestMatchers("/api/**") // NOSONAR: CSRF desabilitado intencionalmente para /api/** — autenticação via sessão HTTP garante proteção equivalente
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/register", "/css/**", "/js/**",
