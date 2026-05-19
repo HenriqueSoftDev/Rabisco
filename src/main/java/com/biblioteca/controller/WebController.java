@@ -50,6 +50,7 @@ public class WebController {
     public String newBookPage(Model model) {
         model.addAttribute("statuses", BookStatus.values());
         model.addAttribute("book", new com.biblioteca.dto.BookRequest());
+        model.addAttribute("bookId", "");
         model.addAttribute("mode", "new");
         return "books/form";
     }
@@ -61,6 +62,7 @@ public class WebController {
         String userId = getUserId(principal);
         var book = bookService.findById(id, userId);
         model.addAttribute("book", book);
+        model.addAttribute("bookId", book.getId());
         model.addAttribute("statuses", BookStatus.values());
         model.addAttribute("mode", "edit");
         return "books/form";

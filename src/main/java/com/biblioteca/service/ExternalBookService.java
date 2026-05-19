@@ -3,6 +3,8 @@ package com.biblioteca.service;
 import com.biblioteca.dto.ExternalBookInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -11,6 +13,8 @@ import java.util.Optional;
 
 @Service
 public class ExternalBookService {
+
+    private static final Logger log = LoggerFactory.getLogger(ExternalBookService.class);
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -26,13 +30,17 @@ public class ExternalBookService {
 
     public Optional<ExternalBookInfo> lookupByIsbn(String isbn) {
         String url = baseUrl + "/api/books?bibkeys=ISBN:" + isbn + "&format=json&jscmd=data";
+        log.info("Consultando Open Library para ISBN {}: {}", isbn, url);
         try {
             String response = restTemplate.getForObject(url, String.class);
+            log.info("Resposta Open Library (ISBN {}): {}", isbn, response);
             if (response == null || response.isBlank() || response.equals("{}")) {
+                log.warn("ISBN {} não encontrado na Open Library (resposta vazia)", isbn);
                 return Optional.empty();
             }
             return parseOpenLibraryResponse(isbn, response);
         } catch (Exception e) {
+            log.error("Erro ao consultar Open Library para ISBN {}: {}", isbn, e.getMessage());
             return Optional.empty();
         }
     }
@@ -77,6 +85,7 @@ public class ExternalBookService {
             }
             return Optional.of(info);
         } catch (Exception e) {
+            log.error("Erro ao parsear resposta da Open Library (ISBN {}): {}", isbn, e.getMessage());
             return Optional.empty();
         }
     }

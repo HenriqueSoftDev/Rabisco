@@ -107,10 +107,10 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- WireMock (VCR) -->
+    <!-- WireMock (VCR) — standalone inclui Jetty embutido, evita conflito com Jetty do Spring Boot -->
     <dependency>
       <groupId>org.wiremock</groupId>
-      <artifactId>wiremock</artifactId>
+      <artifactId>wiremock-standalone</artifactId>
       <version>${wiremock.version}</version>
       <scope>test</scope>
     </dependency>
