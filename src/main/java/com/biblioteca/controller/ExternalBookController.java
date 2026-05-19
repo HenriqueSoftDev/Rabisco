@@ -20,6 +20,10 @@ public class ExternalBookController {
 
     @GetMapping("/lookup")
     public ResponseEntity<ExternalBookInfo> lookup(@RequestParam String isbn) {
+        // Valida formato do ISBN (somente dígitos, X e hífens) antes de usar em URL externa
+        if (isbn == null || !isbn.matches("[0-9X\\-]{10,17}")) {
+            return ResponseEntity.badRequest().build();
+        }
         return externalBookService.lookupByIsbn(isbn)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

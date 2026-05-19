@@ -3,6 +3,7 @@ package com.biblioteca.controller;
 import com.biblioteca.dto.BookRequest;
 import com.biblioteca.dto.BookResponse;
 import com.biblioteca.model.BookStatus;
+import com.biblioteca.model.User;
 import com.biblioteca.repository.UserRepository;
 import com.biblioteca.service.BookService;
 import jakarta.validation.Valid;
@@ -77,7 +78,7 @@ public class BookController {
 
     private String getUserId(UserDetails principal) {
         return userRepository.findByUsername(principal.getUsername())
-                .map(u -> u.getId())
+                .map(User::getId)
                 .orElseThrow();
     }
 }

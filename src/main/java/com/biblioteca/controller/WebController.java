@@ -1,6 +1,7 @@
 package com.biblioteca.controller;
 
 import com.biblioteca.model.BookStatus;
+import com.biblioteca.model.User;
 import com.biblioteca.repository.UserRepository;
 import com.biblioteca.service.BookService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -84,7 +85,7 @@ public class WebController {
 
     private String getUserId(UserDetails principal) {
         return userRepository.findByUsername(principal.getUsername())
-                .map(u -> u.getId())
+                .map(User::getId)
                 .orElseThrow();
     }
 }

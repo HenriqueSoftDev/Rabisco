@@ -29,18 +29,20 @@ public class ExternalBookService {
     }
 
     public Optional<ExternalBookInfo> lookupByIsbn(String isbn) {
-        String url = baseUrl + "/api/books?bibkeys=ISBN:" + isbn + "&format=json&jscmd=data";
-        log.info("Consultando Open Library para ISBN {}: {}", isbn, url);
+        // Sanitiza o ISBN para log (previne log injection com dados controlados pelo usuário)
+        String safeIsbn = isbn.replaceAll("[^0-9X\\-]", "");
+        String url = baseUrl + "/api/books?bibkeys=ISBN:" + safeIsbn + "&format=json&jscmd=data";
+        log.info("Consultando Open Library para ISBN {}: {}", safeIsbn, url); // NOSONAR: isbn sanitizado antes do log
         try {
             String response = restTemplate.getForObject(url, String.class);
-            log.info("Resposta Open Library (ISBN {}): {}", isbn, response);
+            log.info("Resposta Open Library (ISBN {}): {}", safeIsbn, response); // NOSONAR: isbn sanitizado antes do log
             if (response == null || response.isBlank() || response.equals("{}")) {
-                log.warn("ISBN {} não encontrado na Open Library (resposta vazia)", isbn);
+                log.warn("ISBN {} não encontrado na Open Library (resposta vazia)", safeIsbn); // NOSONAR: isbn sanitizado antes do log
                 return Optional.empty();
             }
-            return parseOpenLibraryResponse(isbn, response);
+            return parseOpenLibraryResponse(safeIsbn, response);
         } catch (Exception e) {
-            log.error("Erro ao consultar Open Library para ISBN {}: {}", isbn, e.getMessage());
+            log.error("Erro ao consultar Open Library para ISBN {}: {}", safeIsbn, e.getMessage());
             return Optional.empty();
         }
     }
